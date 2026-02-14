@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    purge)
+        rm -rf /var/lib/frieren
+        rm -rf /etc/frieren
+
+        if getent passwd frieren > /dev/null 2>&1; then
+            userdel frieren
+        fi
+        if getent group frieren > /dev/null 2>&1; then
+            groupdel frieren
+        fi
+        ;;
+    remove)
+        :
+        ;;
+esac
+
+#DEBHELPER#

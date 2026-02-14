@@ -1,0 +1,6 @@
+discord_token = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+database_path = "./messages.db"
+storage_path = "./images"
+daily_post_time = "07:00"
+post_channel_id = "12345678901234567890"
+

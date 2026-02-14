@@ -1,0 +1,10 @@
+/target
+scratch/
+/.env
+/.vscode
+/*.env
+/change_target.sh
+/tmp
+/migrations
+/config.toml
+/data

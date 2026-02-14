@@ -1,0 +1,16 @@
+[Unit]
+Description=Discord Bot Frieren
+After=network.target
+
+[Service]
+Type=simple
+User=frieren
+Group=frieren
+ExecStart=/usr/bin/frieren
+WorkingDirectory=/var/lib/frieren
+Restart=on-failure
+Environment=FRIEREN_CONFIG=/etc/frieren/config.toml
+# Environment=RUST_LOG=frieren=info
+
+[Install]
+WantedBy=multi-user.target

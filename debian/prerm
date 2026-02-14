@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    remove|purge)
+        systemctl stop frieren || true
+        systemctl disable frieren || true
+        ;;
+esac
+
+#DEBHELPER#

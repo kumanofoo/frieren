@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    configure)
+        if ! getent group frieren > /dev/null 2>&1; then
+            groupadd --system frieren
+        fi
+        if ! getent passwd frieren > /dev/null 2>&1; then
+            useradd --system \
+                    --gid frieren \
+                    --no-create-home \
+                    --shell /bin/false \
+                    --home-dir /var/lib/frieren \
+                    frieren
+        fi
+
+        install -d -o frieren -g frieren -m 750 /var/lib/frieren
+        install -d -o frieren -g frieren -m 750 /var/lib/frieren/images
+
+        chown root:frieren /etc/frieren/config.toml
+        chmod 644 /etc/frieren/config.toml
+    ;;
+esac
+
+#DEBHELPER#
