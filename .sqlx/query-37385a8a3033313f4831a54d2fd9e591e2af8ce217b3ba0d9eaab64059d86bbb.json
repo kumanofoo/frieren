@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT content,\n               attachments_json,\n               created_at\n        FROM messages\n        WHERE created_at >= ?\n          AND created_at <= ?\n          AND strftime('%Y', datetime(created_at, 'unixepoch'))\n              < strftime('%Y', 'now', 'localtime')\n        ORDER BY created_at DESC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "content",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "attachments_json",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "37385a8a3033313f4831a54d2fd9e591e2af8ce217b3ba0d9eaab64059d86bbb"
+}
