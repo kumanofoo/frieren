@@ -1,0 +1,90 @@
+name: Build and Release Debian Package
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: frieren
+
+jobs:
+  build:
+    name: Build deb (${{ matrix.arch }})
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            target: x86_64-unknown-linux-gnu
+          - arch: arm64
+            target: aarch64-unknown-linux-gnu
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev
+
+      - name: Install cargo-deb
+        run: cargo install cargo-deb
+
+      - name: Install cross (for arm64)
+        if: matrix.arch == 'arm64'
+        run: cargo install cross
+
+      - name: Build binary
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            cross build --release --target ${{ matrix.target }}
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+
+      - name: Build deb package
+        run: |
+          OUTPUT="${{ env.APP_NAME }}_${{ steps.version.outputs.VERSION }}_${{ matrix.arch }}.deb"
+
+          cargo deb             --target ${{ matrix.target }}             --no-build             --output "target/$OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-${{ matrix.arch }}
+          path: target/*.deb
+
+  release:
+    name: Publish Release
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            deb-amd64/*.deb
+            deb-arm64/*.deb
