@@ -54,7 +54,8 @@ jobs:
         run: cargo install cross
 
       - name: Build binary
-        env: SQLX_OFFLINE: true
+        env:
+          SQLX_OFFLINE: true
         run: |
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             cross build --release --target ${{ matrix.target }}
