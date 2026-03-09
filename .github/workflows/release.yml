@@ -61,12 +61,9 @@ jobs:
 
       - name: Build deb package
         run: |
-          OUTPUT="${{ env.APP_NAME }}_${{ steps.version.outputs.VERSION }}_${{ matrix.arch }}.deb"
-
           cargo deb \
             --target ${{ matrix.target }} \
-            --no-build \
-            --output "target/$OUTPUT"
+            --no-build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
