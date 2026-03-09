@@ -19,7 +19,7 @@ case "$1" in
         install -d -o frieren -g frieren -m 750 /var/lib/frieren/images
 
         chown root:frieren /etc/frieren/config.toml
-        chmod 644 /etc/frieren/config.toml
+        chmod 640 /etc/frieren/config.toml
     ;;
 esac
 
