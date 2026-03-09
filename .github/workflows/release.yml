@@ -17,15 +17,17 @@ env:
 jobs:
   build:
     name: Build deb (${{ matrix.arch }})
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.runner }} # ubuntu-22.04
 
     strategy:
       matrix:
         include:
           - arch: amd64
             target: x86_64-unknown-linux-gnu
+            runner: ubuntu-22.04
           - arch: arm64
             target: aarch64-unknown-linux-gnu
+            runner: ubuntu-22.04-arm
 
     steps:
       - name: Checkout
@@ -33,41 +35,36 @@ jobs:
 
       - name: Extract version from tag
         id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Restore cargo cache
         uses: dtolnay/rust-toolchain@stable
 
       - name: Add target
         run: rustup target add ${{ matrix.target }}
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y dpkg-dev
-
       - name: Install cargo-deb
         run: cargo install cargo-deb
-
-      - name: Install cross (for arm64)
-        if: matrix.arch == 'arm64'
-        run: cargo install cross
 
       - name: Build binary
         env:
           SQLX_OFFLINE: true
         run: |
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            cross build --release --target ${{ matrix.target }}
-          else
-            cargo build --release --target ${{ matrix.target }}
-          fi
+          cargo build --release --target ${{ matrix.target }}
 
       - name: Build deb package
         run: |
           OUTPUT="${{ env.APP_NAME }}_${{ steps.version.outputs.VERSION }}_${{ matrix.arch }}.deb"
 
-          cargo deb             --target ${{ matrix.target }}             --no-build             --output "target/$OUTPUT"
+          cargo deb \
+            --target ${{ matrix.target }}
+            --no-build
+            --output "target/$OUTPUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
