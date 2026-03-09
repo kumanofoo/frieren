@@ -62,8 +62,8 @@ jobs:
           OUTPUT="${{ env.APP_NAME }}_${{ steps.version.outputs.VERSION }}_${{ matrix.arch }}.deb"
 
           cargo deb \
-            --target ${{ matrix.target }}
-            --no-build
+            --target ${{ matrix.target }} \
+            --no-build \
             --output "target/$OUTPUT"
 
       - name: Upload artifact
