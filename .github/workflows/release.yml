@@ -69,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deb-${{ matrix.arch }}
-          path: target/*.deb
+          path: target/debian/*.deb
 
   release:
     name: Publish Release
